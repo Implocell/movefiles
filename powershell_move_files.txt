@@ -1,0 +1,116 @@
+#todo, third option, if file exist copy if lastwrite date is larger than target directory fily
+
+#list of all folders
+$folders = @("FR","FA","IN","PP","PY","RR")
+
+#take input from user to which is how files are dated
+$dateInput = Read-Host -Prompt "Skriv inn år og måned sammen. F.eks: 201907 om året er 2019 og måned er Juli"
+	
+write-output "---Du har valgt $dateInput, finner alle filer med denne datoen---"
+	
+	#grab all files in current directory which are pdf files and the inputted date from user match file names
+	$listOfFilesPDF = get-childitem -path *.pdf -ErrorAction SilentlyContinue -Force | Where-Object -FilterScript{$_.Name-match $dateInput}
+
+	#show user all files which match previous criterias
+	write-output $listOfFilesPDF
+	write-output "---Dette var alle filene som ble funnet---"
+	
+	#give user a choice to either replace all files and overwrite old or just copy files which does not exist in target directory
+	$accept_input = Read-Host -Prompt "For å overskrive filer som allerede ligger i mappen skriv 1, ønsker du kun å kopiere ikke eksisterende filer skriv 2."
+	
+	#only copy non-existing files
+	if ($accept_input -eq "2"){
+		#iterate through each folder and set as parameter, change folders to change target destination
+		ForEach($folder in $folders){
+			$listOfFilesPDF | Where-Object -FilterScript{$_.Name-like "*_$folder-*"} | move-item -destination $folder -ErrorAction SilentlyContinue
+			}
+		}
+
+	#overwrite all files
+	if ($accept_input -eq "1"){
+		#iterate through each folder and set as parameter, change folders to change target destination
+		ForEach($folder in $folders){
+			$listOfFilesPDF | Where-Object -FilterScript{$_.Name-like "*_$folder-*"} | move-item -destination $folder -Force
+			}
+		}
+
+#save all names from remaning files in directory
+$listOfFilesPDFRemaining = get-childitem -path *.pdf -ErrorAction SilentlyContinue -Force| Where-Object -FilterScript{$_.Name-match $dateInput} | Select-Object Name
+
+#if variable has names then print the list of files to user, else tell user no files are left with that date.
+if($listOfFilesPDFRemaining)
+{
+write-output "---Følgende filer ligger igjen i mappen med $dateInput---"
+write-output $listOfFilesPDFRemaining
+}
+Else {write-output "Ingen filer med $dateInput igjen"}
+
+$writeCSV = Read-Host -Prompt "For å skrive en liste med alle filene med angitt dato til fil tast 1, hvis du ikke ønsker dette trykk Enter."
+if($writeCSV -eq "1"){
+Get-ChildItem  -Filter *.pdf -Recurse | Where-Object -FilterScript{$_.Name-match $dateInput} | Select-Object basename, lastwritetime, creationtime | Export-Csv -Path filenames.csv -Encoding ascii -NoTypeInformation
+}
+
+Read-Host -Prompt "Trykk på Enter for avslutte"
+
+
+
+_______________________________________________________________________
+GrabFiles
+
+
+
+
+#list of some directories
+#$directories = @("C:\*","D:\*","E:\*","G:\*")
+$directories = @("C:\Users\granth\Documents\iGrafx\*")
+
+#take input from user regarding what filetypes to copy e.g. image like jpg
+$filetypeInput = Read-Host -Prompt "Type filetype extension without . e.g. type jpg for jpg files, xlsx for excel files."
+	
+write-output "---You choose $filetypeInput, locating files please wait.---"
+	
+	#grab all files from input filetype
+	ForEach($directory in $directories){
+	$listOfFiles += Get-ChildItem -Path $directory -Include *.$filetypeInput -ErrorAction SilentlyContinue -Force -Recurse
+}
+
+	#show user all files which match previous criterias
+	write-output $listOfFiles
+	write-output "---Found these files with $filetypeInput extension---"
+	
+	#give user a choice to either replace all files and overwrite old or just copy files which does not exist in target directory
+	$accept_input = Read-Host -Prompt "To overwrite all files if name exist type 1, else type 2 to only copy non existing files."
+	
+	#only copy non-existing files
+	if ($accept_input -eq "2"){
+			$listOfFiles | Copy-Item -Destination 'files'-ErrorAction SilentlyContinue
+		}
+
+	#overwrite all files
+	if ($accept_input -eq "1"){
+		forEach($filename in $listOfFiles){
+			$tempPath = "files\" + $filename.Name
+			write-output $tempPath
+			if(test-path $tempPath){remove-item $tempPath}}
+		$listOfFiles | Copy-Item -destination 'files' -ErrorAction SilentlyContinue -Force
+		}
+
+#save all names from remaning files in directory
+#$listOfFilesPDFRemaining = get-childitem -path *.pdf -ErrorAction SilentlyContinue -Force| Where-Object -FilterScript{$_.Name-match $dateInput} | Select-Object Name
+
+#if variable has names then print the list of files to user, else tell user no files are left with that date.
+#if($listOfFilesPDFRemaining)
+#{
+#write-output "---Følgende filer ligger igjen i mappen med $dateInput---"
+#write-output $listOfFilesPDFRemaining
+#}
+#Else {write-output "Ingen filer med $dateInput igjen"}
+
+#$writeCSV = Read-Host -Prompt "For å skrive en liste med alle filene med angitt dato til fil tast 1, hvis du ikke ønsker dette trykk Enter."
+#if($writeCSV -eq "1"){
+#Get-ChildItem  -Filter *.pdf -Recurse | Where-Object -FilterScript{$_.Name-match $dateInput} | Select-Object basename, lastwritetime, creationtime | Export-Csv -Path filenames.csv -Encoding ascii -NoTypeInformation
+#}
+
+Read-Host -Prompt "Press Enter to shutdown"
+
+
