@@ -24,7 +24,7 @@ class MoveFiles:
                 for filename in os.listdir(self.start_directory):
                     if filename.endswith(filetype):
                         filetype_directory = filetype
-                        os.rename(self.start_directory + "/"+ filename, self.start_directory + "/" + str.replace(filetype,".","") + "/" + filename)
+                        os.rename(self.start_directory + "/"+ filename, self.end_directory + "/" + str.replace(filetype,".","") + "/" + filename)
         else:
             print("missing filetypes")
 
@@ -66,7 +66,7 @@ def get_user_input():
     return list_of_user_input
 
 
-start_directory = "project_1/"
+start_directory = "project_1"
 end_directory = "project_1/project_1_text"
 
 movefiles = MoveFiles(start_directory, end_directory)
