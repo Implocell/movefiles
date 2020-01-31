@@ -1,5 +1,11 @@
 import os
 import shutil
+'''
+search_base: e.g. /users/myname
+target_base: e.g. /users/myname/my_excel_files
+type_of_sort: Rename file to parent folder will append folder name infront of filename seperated with -
+file_extension_input: Type what type of files to move by extension, start with a dot. E.g. .xlsx
+'''
 
 def move_files(type_of_sort, file_extension_input, search_base, target_base):
     moved_files = []
@@ -8,7 +14,7 @@ def move_files(type_of_sort, file_extension_input, search_base, target_base):
             if file.endswith(file_extension_input):
                 try:
                     if type_of_sort == 1:
-                        shutil.copy(root + "/"+ file, target_base + "/" + root.split(os.sep)[-1] + file)
+                        shutil.copy(root + "/"+ file, target_base + "/" + root.split(os.sep)[-1] + "-" + file)
                     if type_of_sort == 2:
                         shutil.copy(root + "/"+ file, target_base + "/" + file)
                 except:
@@ -18,7 +24,7 @@ def move_files(type_of_sort, file_extension_input, search_base, target_base):
             moved_files.append(file)
 
 
-    print (f'Files have been copied from {search_base} to {target_base}, this is a list of the files: \n')
+    print (f'Files have been copied from {search_base} to {target_base}\n')
     #print([f for f in moved_files])
 
 def get_user_input():
